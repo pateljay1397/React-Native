@@ -1,8 +1,15 @@
 import React, { Component } from 'react';
 import { ScrollView, View , Image } from 'react-native';
 import { Card, Text } from 'react-native-elements';
-import { LEADERS } from '../shared/leaders.js';
+import {FlatList} from 'react-native';
+import { connect } from 'react-redux';
+import { baseUrl } from '../shared/baseUrl';
 
+const mapStateToProps = state => {
+    return {
+      leaders: state.leaders
+    }
+  }
 
 function RenderLeader({leader}){
     return(
@@ -10,7 +17,7 @@ function RenderLeader({leader}){
           <Image
             resizeMode="cover"
             style={{height:50,width:50, margin: 2}}
-            source={require('./images/alberto.png')}
+            source={{uri: baseUrl + item.image}}
           />
           <View style={{flex: 1,flexDirection: "column"}}>
           <Text h4 style={{ margin : 2}}>{leader.name}</Text>
@@ -25,13 +32,6 @@ class About extends Component {
     static navigationOptions = {
         title: 'About',
     };
-
-    constructor(props){
-        super(props);
-        this.state = {
-            leaders : LEADERS
-        }
-    }
 
     render(){
 
@@ -52,14 +52,15 @@ class About extends Component {
                 that featured for the first time the world's best cuisines in a pan.
                 </Text>
                 </Card>
-                <Card
-                    title='Corporate Leadership'
-                >
-                {leadersR}
+                <Card title='Corporate Leadership'>
+                <FlatList 
+                data={this.props.leaders.leaders}
+                renderItem={renderLeader}
+                keyExtractor={item => item.id.toString()}
+                />
                 </Card>
             </ScrollView>
         )
     }
 }
-
-export default About;
+export default connect(mapStateToProps)(About);
