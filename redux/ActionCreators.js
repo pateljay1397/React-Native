@@ -13,6 +13,11 @@ export const addFavorite = (dishId) => ({
     payload: dishId
 });
 
+export const deleteFavorite = (dishId) => ({
+    type: ActionTypes.DELETE_FAVORITE,
+    payload: dishId
+});
+
 export const fetchComments = () => (dispatch) => {
     return fetch(baseUrl + 'comments')
     .then(response => {
@@ -190,14 +195,4 @@ export const postComment = (dishId, rating, author, comment) => (dispatch) => {
 export const addComment = (comment) => ({
     type: ActionTypes.ADD_COMMENT,
     payload: comment
-});
-
-export const addFavorite = (dishId) => ({
-    type: ActionTypes.ADD_FAVORITE,
-    payload: dishId
-});
-
-export const deleteFavorite = (dishId) => ({
-    type: ActionTypes.DELETE_FAVORITE,
-    payload: dishId
 });
