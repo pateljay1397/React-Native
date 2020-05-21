@@ -3,7 +3,6 @@ import { Text, View, ScrollView, FlatList, Modal, Button, StyleSheet} from 'reac
 import { Card, Icon, Rating, Input } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { postFavorite, postComment } from '../redux/ActionCreators';
-
 import { baseUrl } from '../shared/baseUrl';
 
 const mapStateToProps = state => {
