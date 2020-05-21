@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, ScrollView, FlatList, Modal, Button, StyleSheet } from 'react-native';
+import { Text, View, ScrollView, FlatList, Modal, StyleSheet, Button, Alert, PanResponder } from 'react-native';
 import { Card, Icon, Rating, Input } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { postFavorite, postComment } from '../redux/ActionCreators';
@@ -13,16 +13,12 @@ const mapStateToProps = state => {
         favorites: state.favorites
     }
 }
-
 const mapDispatchToProps = dispatch => ({
     postFavorite: (dishId) => dispatch(postFavorite(dishId)),
     postComment: (dishId, rating, author, comment) => dispatch(postComment(dishId, rating, author, comment))
 })
-
 function RenderComments(props) {
-
     const comments = props.comments;
-
     const renderCommentItem = ({ item, index }) => {
 
         return (
@@ -54,6 +50,32 @@ function RenderComments(props) {
 
 function RenderDish(props) {
     const dish = props.dish;
+    const recognizeDrag = ({ moveX, moveY, dx, dy }) => {
+        if (dx < -200)
+            return true;
+        else
+            return false;
+    }
+    const panResponder = PanResponder.create({
+        onStartShouldSetPanResponder: (e, gestureState) => {
+            return true;
+        },
+        onPanResponderEnd: (e, gestureState) => {
+            console.log("pan responder end", gestureState);
+            if (recognizeDrag(gestureState))
+                Alert.alert(
+                    'Add Favorite',
+                    'Are you sure you wish to add ' + dish.name + ' to favorite?',
+                    [
+                        { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+                        { text: 'OK', onPress: () => { props.favorite ? console.log('Already favorite') : props.onPress() } },
+                    ],
+                    { cancelable: false }
+                );
+
+            return true;
+        }
+    });
 
     if (dish != null) {
         return (
@@ -73,7 +95,11 @@ function RenderDish(props) {
                             color='#f50'
                             onPress={() => props.favorite ? console.log('Already favorite') : props.onPress()}
                         />
-                        <Icon raised reverse name='pencil' type='font-awesome' color='#512DA8' style={styles.cardItem}
+                        <Icon raised
+                            reverse
+                            name='pencil'
+                            type='font-awesome'
+                            color='#512DA8' style={styles.cardItem}
                             onPress={() => props.onShowModal()}
                         />
                     </View>
