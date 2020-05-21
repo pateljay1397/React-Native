@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
-import { Text, View, ScrollView, FlatList, Modal, Button, StyleSheet} from 'react-native';
+import { Text, View, ScrollView, FlatList, Modal, Button, StyleSheet } from 'react-native';
 import { Card, Icon, Rating, Input } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { postFavorite, postComment } from '../redux/ActionCreators';
 import { baseUrl } from '../shared/baseUrl';
+import * as Animatable from 'react-native-animatable';
 
 const mapStateToProps = state => {
     return {
-      dishes: state.dishes,
-      comments: state.comments,
-      favorites: state.favorites
+        dishes: state.dishes,
+        comments: state.comments,
+        favorites: state.favorites
     }
 }
 
@@ -21,31 +22,33 @@ const mapDispatchToProps = dispatch => ({
 function RenderComments(props) {
 
     const comments = props.comments;
-            
-    const renderCommentItem = ({item, index}) => {
-        
+
+    const renderCommentItem = ({ item, index }) => {
+
         return (
-            <View key={index} style={{margin: 10}}>
-                <Text style={{fontSize: 14}}>{item.comment}</Text>
+            <View key={index} style={{ margin: 10 }}>
+                <Text style={{ fontSize: 14 }}>{item.comment}</Text>
                 <Rating
                     imageSize={20}
                     readonly
                     startingValue={item.rating}
                     style={{ paddingVertical: 10, alignSelf: 'flex-start' }}
                 />
-                <Text style={{fontSize: 12}}>{'-- ' + item.author + ', ' + item.date} </Text>
+                <Text style={{ fontSize: 12 }}>{'-- ' + item.author + ', ' + item.date} </Text>
             </View>
         );
     };
-    
+
     return (
-        <Card title='Comments' >
-        <FlatList 
-            data={comments}
-            renderItem={renderCommentItem}
-            keyExtractor={item => item.id.toString()}
-            />
-        </Card>
+        <Animatable.View animation="fadeInUp" duration={2000} delay={1000}>
+            <Card title='Comments' >
+                <FlatList
+                    data={comments}
+                    renderItem={renderCommentItem}
+                    keyExtractor={item => item.id.toString()}
+                />
+            </Card>
+        </Animatable.View>
     );
 }
 
@@ -53,30 +56,32 @@ function RenderDish(props) {
     const dish = props.dish;
 
     if (dish != null) {
-            return(
+        return (
+            <Animatable.View animation="fadeInDown" duration={2000} delay={1000}>
                 <Card
-                featuredTitle={dish.name}
-                image={{ uri: baseUrl + dish.image}}>
-                    <Text style={{margin: 10}}>
+                    featuredTitle={dish.name}
+                    image={{ uri: baseUrl + dish.image }}>
+                    <Text style={{ margin: 10 }}>
                         {dish.description}
                     </Text>
                     <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
                         <Icon
                             raised
                             reverse
-                            name={ props.favorite ? 'heart' : 'heart-o'}
+                            name={props.favorite ? 'heart' : 'heart-o'}
                             type='font-awesome'
                             color='#f50'
                             onPress={() => props.favorite ? console.log('Already favorite') : props.onPress()}
                         />
-                        <Icon raised reverse name='pencil' type='font-awesome' color='#512DA8'
-                            onPress={() => props.onPressComment()}
+                        <Icon raised reverse name='pencil' type='font-awesome' color='#512DA8' style={styles.cardItem}
+                            onPress={() => props.onShowModal()}
                         />
                     </View>
                 </Card>
-            );
+            </Animatable.View>
+        );
     }
-        else {
+    else {
         return (<View></View>);
     }
 
@@ -117,7 +122,7 @@ class Dishdetail extends Component {
     markFavorite(dishId) {
         this.props.postFavorite(dishId);
     }
-    
+
 
     render() {
         const dishId = this.props.navigation.getParam('dishId', '');
