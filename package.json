@@ -10,6 +10,7 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "expo": "^37.0.12",
+    "expo-calendar": "~8.1.0",
     "expo-camera": "~8.2.0",
     "expo-image-picker": "~8.1.0",
     "expo-mail-composer": "~8.1.0",

@@ -3,7 +3,8 @@ import { Text, View, StyleSheet, Picker, Switch, Button, Modal, ScrollView, Aler
 import { Card } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker'
 import * as Animatable from 'react-native-animatable';
-import { Permissions, Notifications} from 'expo-permissions';
+import { Permissions, Notifications, } from 'expo-permissions';
+import * as Calendar from 'expo-calendar';
 
 
 class Reservation extends Component {
@@ -33,7 +34,7 @@ class Reservation extends Component {
             showModal: false
         });
     }
-    handleReservation() {
+   handleReservation() {
         console.log(JSON.stringify(this.state));
         this.toggleModal();
     }
@@ -49,6 +50,17 @@ class Reservation extends Component {
         return permission;
     }
 
+    static async obtainCalendarPermission() {
+        let permission = await Permissions.getAsync(Permissions.CALENDAR);
+        if (permission.status !== 'granted') {
+          permission = await Permissions.askAsync(Permissions.CALENDAR);
+          if (permission.status !== 'granted') {
+            Alert.alert('Permission not granted to access the calendar');
+          }
+        }
+        return permission;
+      }
+  
     async presentLocalNotification(date) {
         await this.obtainNotificationPermission();
         Notifications.presentLocalNotificationAsync({
@@ -64,6 +76,51 @@ class Reservation extends Component {
             }
         });
     }
+
+    static async addReservationToCalendar(date) {
+        await Reservation.obtainCalendarPermission();
+        const startDate = new Date(Date.parse(date));
+        const endDate = new Date(Date.parse(date) + (2 * 60 * 60 * 1000)); // 2 hours
+        Calendar.createEventAsync(
+          Calendar.DEFAULT,
+          {
+            title: 'Con Fusion Table Reservation',
+            location: '121, Clear Water Bay Road, Clear Water Bay, Kowloon, Hong Kong',
+            startDate,
+            endDate,
+            timeZone: 'Asia/Hong_Kong',
+          },
+        );
+        Alert.alert('Reservation has been added to your calendar');
+      }
+
+/*    addReservationToCalenda(date) {
+        Reservation.presentLocalNotification(date);
+        Reservation.addReservationToCalendar(date);
+        this.resetForm();
+      }*/
+
+   /* handleReservation() {
+        const { date, guests, smoking } = this.state;
+  
+        Alert.alert(
+          'Your Reservation OK?',
+          `Number of guests: ${guests}\nSmoking? ${smoking ? 'Yes' : 'No'}\nDate and Time:${date}`,
+          [
+            {
+              text: 'Cancel',
+              style: 'cancel',
+              onPress: () => this.resetForm(),
+            },
+            {
+              text: 'OK',
+              // eslint-disable-next-line no-confusing-arrow, no-console
+              onPress: () => this.addReservationToCalenda(date),
+            },
+          ],
+          { cancelable: false },
+        );
+      }*/
 
     render() {
         return (
@@ -129,12 +186,14 @@ class Reservation extends Component {
                                     [
                                         {
                                             text: 'CANCEL',
-                                            style: 'cancel'
+                                            style: 'cancel',
+                                            onPress: () => this.resetForm()
                                         },
                                         {
                                             text: 'OK',
                                             onPress: () => {this.presentLocalNotification(this.state.date), 
-                                            this.resetForm()}
+                                                this.addReservationToCalenda(date),
+                                                this.resetForm()}
                                         }
                                     ],
                                     { cancelable: false }
